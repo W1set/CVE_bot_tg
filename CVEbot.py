@@ -14,17 +14,17 @@ import requests
 def _require_env(name):
     val = os.environ.get(name)
     if not val:
-        raise SystemExit(f"Не задана переменная окружения {name}. См. инструкцию в начале файла.")
+        raise SystemExit(f"Flase {name}.")
     return val
 
 TELEGRAM_TOKEN = _require_env("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = _require_env("TELEGRAM_CHAT_ID")
-NVD_API_KEY = os.environ.get("NVD_API_KEY")        # опционально, поднимает рейт-лимит NVD
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")      # опционально, поднимает рейт-лимит GitHub Search
+NVD_API_KEY = os.environ.get("NVD_API_KEY")        
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")    
 
-POLL_INTERVAL_SEC = 15 * 60   # как часто опрашивать NVD
-LOOKBACK_MIN = 20             # окно поиска новых CVE за цикл (с запасом > интервала опроса)
-MIN_CVSS_TO_ALERT = 0.0       # например 7.0, чтобы получать только HIGH/CRITICAL
+POLL_INTERVAL_SEC = 15 * 60   
+LOOKBACK_MIN = 20             
+MIN_CVSS_TO_ALERT = 0.0      
 STATE_FILE = "seen_cves.json"
 
 NVD_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0"
@@ -148,7 +148,7 @@ def find_poc_repos(cve_id, limit=3):
         items = r.json().get("items", [])[:limit]
         return [(it["full_name"], it["html_url"]) for it in items]
     except requests.RequestException:
-        return []  # лимит запросов или сеть — просто пропускаем этот блок
+        return []
 
 # ------------------------------------------------------------------ TELEGRAM
 
@@ -212,7 +212,7 @@ def main():
                 seen.add(cve_id)
                 save_seen(seen)
                 log.info("Отправлено: %s", cve_id)
-                time.sleep(1)  # не долбить Telegram API подряд
+                time.sleep(1)  
         except requests.RequestException as e:
             log.error("Ошибка запроса: %s", e)
         time.sleep(POLL_INTERVAL_SEC)
